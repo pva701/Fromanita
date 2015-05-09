@@ -20,7 +20,7 @@ public class AmanitaController : MonoBehaviour {
 	}
 
 	void Update () {
-		Move (dir, 0);
+		//Move (dir, 0);
 		if (counter++ == 100) {
 			counter = 0;
 			if (Random.Range (0, 2) == 0)

@@ -8,6 +8,7 @@ public class FrogController : MonoBehaviour {
     private Animator animator;
     private Rigidbody2D rb2D;
     private bool isMove = false;
+    private float STEP = 0.02f;
 
 	void Awake() {
         inverseMoveTime = 1.0f / moveTime;
@@ -33,25 +34,34 @@ public class FrogController : MonoBehaviour {
 
     void MoveByX(float xDir)
     {
-        if (!isMove)
+        Vector3 newPos = transform.position + new Vector3(xDir, 0, 0);
+        rb2D.MovePosition(newPos);
+        //rb2D.AddRelativeForce(new Vector2(xDir, 0));
+        //rb2D.AddForce(new Vector2(xDir, 0));
+        //return;
+        /*if (!isMove)
         {
             print("move");
             StartCoroutine(SmoothMovementByX(xDir));
-        }
+        }*/
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        print("collision");
-        animator.SetTrigger("frogJump");
+        if (collision.gameObject.name == "Ground")
+            print("ground");
+        else {
+            print("amanita");
+            animator.SetTrigger("frogJump");
+        }
     }
 
     int counter = 0;
 	void Update () {
         //++counter;
         //print(counter);
-        if (InputManager.instance.isLeft) MoveByX(-1);
-        else if (InputManager.instance.isRight) MoveByX(1);
+        if (InputManager.instance.isLeft) MoveByX(-STEP);
+        else if (InputManager.instance.isRight) MoveByX(STEP);
 
         if (counter == 50)
         {

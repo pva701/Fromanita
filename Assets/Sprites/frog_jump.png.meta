@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: ca4d8780f0f0515428235379d2aca09a
-timeCreated: 1431113907
+timeCreated: 1431171910
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -59,20 +59,20 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 31
+        width: 32
         height: 28
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: frog_jump_1
       rect:
         serializedVersion: 2
-        x: 31
+        x: 0
         y: 0
-        width: 31
+        width: 32
         height: 28
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: frog_jump_2
       rect:
@@ -82,7 +82,7 @@ TextureImporter:
         width: 31
         height: 28
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: frog_jump_3
       rect:
@@ -92,7 +92,7 @@ TextureImporter:
         width: 31
         height: 28
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: frog_jump_4
       rect:
@@ -102,7 +102,7 @@ TextureImporter:
         width: 31
         height: 28
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 
