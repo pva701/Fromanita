@@ -20,7 +20,7 @@ public class AmanitaController : MonoBehaviour {
 	}
 
 	void Update () {
-		//Move (dir, 0);
+		Move (dir, 0);
 		if (counter++ == 100) {
 			counter = 0;
 			if (Random.Range (0, 2) == 0)
@@ -44,5 +44,11 @@ public class AmanitaController : MonoBehaviour {
 		Vector3 np = Vector3.MoveTowards(rb.position, end, inverseMoveTime * Time.deltaTime);
 		rb.MovePosition(np);
 	}
+
+    public void StopMoving()
+    {
+        enabled = false;
+        //TODO write this
+    }
 	
 }
