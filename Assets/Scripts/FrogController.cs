@@ -7,7 +7,7 @@ public class FrogController : MonoBehaviour {
     private float inverseMoveTime;
     private Animator animator;
     private Rigidbody2D rb2D;
-    private float STEP_FORCE = 10.0f;
+    private float STEP_FORCE = 20.0f;
 
 	void Awake() {
         inverseMoveTime = 1.0f / moveTime;
