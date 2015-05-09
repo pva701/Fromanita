@@ -19,9 +19,14 @@ public class AmanitaController : MonoBehaviour {
 		inverseMoveTime = 1f / moveTime;
 	}
 
+    void OnCollisionEnter(Collision collision)
+    {
+        print("collision aman");
+        //animator.SetTrigger("frogJump");
+    }
+
 	void Update () {
-		Move (dir, 0);
-        print(counter);
+		//Move (dir, 0);
 		if (counter++ == 100) {
 			counter = 0;
 			if (Random.Range (0, 2) == 0)
