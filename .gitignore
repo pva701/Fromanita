@@ -4,4 +4,8 @@
 *.csproj
 /Temp
 /ProjectSettings
+<<<<<<< HEAD
 *.suo
+=======
+*.suo
+>>>>>>> without_frog

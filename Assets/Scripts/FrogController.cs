@@ -7,7 +7,7 @@ public class FrogController : MonoBehaviour {
     private float inverseMoveTime;
     private Animator animator;
     private Rigidbody2D rb2D;
-    private bool isMove = false;
+    private float STEP_FORCE = 10.0f;
 
 	void Awake() {
         inverseMoveTime = 1.0f / moveTime;
@@ -16,49 +16,32 @@ public class FrogController : MonoBehaviour {
 	}
 
 
-    protected IEnumerator SmoothMovementByX(float xDir)
+    void MoveByX(float xForce)
     {
-        isMove = true;
-        float speedByX = xDir * inverseMoveTime;
-        float rem = xDir;
-        Vector3 shiftVector = new Vector3(speedByX * Time.deltaTime, 0, 0);
-        int iteration = (int)(moveTime / Time.deltaTime);
-        for (int i = 0; i < iteration; ++i) {
-            Vector3 newPos = transform.position + shiftVector;
-            rb2D.MovePosition(newPos);
-            yield return null;
-        }
-        isMove = false;
+        rb2D.AddForce(new Vector2(xForce, 0));
     }
 
-    void MoveByX(float xDir)
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!isMove)
+        if (collision.gameObject.name == "Ground")
         {
-            print("move");
-            StartCoroutine(SmoothMovementByX(xDir));
+            print("ground");
+            //TODO write check if bounds
+            GameManager.instance.GameOver();
+        } else
+        {
+            print("amanita");
+            animator.SetTrigger("frogJump");
         }
     }
 
-    void OnCollisionEnter(Collision collision)
-    {
-        print("collision");
-        animator.SetTrigger("frogJump");
-    }
-
-    int counter = 0;
 	void Update () {
-        //++counter;
-        //print(counter);
-        if (InputManager.instance.isLeft) MoveByX(-1);
-        else if (InputManager.instance.isRight) MoveByX(1);
-
-        if (counter == 50)
-        {
-            counter = 0;
-            GetComponent<Rigidbody2D>().isKinematic = true;
-            GetComponent<Rigidbody2D>().MovePosition(transform.position + new Vector3(1, 0, 0));
-            GetComponent<Rigidbody2D>().isKinematic = false;
-        }
+        if (InputManager.instance.isLeft) MoveByX(-STEP_FORCE);
+        else if (InputManager.instance.isRight) MoveByX(STEP_FORCE);
 	}
+
+    public void DieAnimation()
+    {
+        animator.SetTrigger("frogDie");
+    }
 }
