@@ -29,8 +29,7 @@ public class InputManager : MonoBehaviour {
 #else
         if (Input.touchCount > 0) {
             Touch touch = Input.touches[0];
-            if (touch.phase == TouchPhase.Began) 
-                dir = (touch.position.x > Screen.width / 2 ? 1 : -1);
+            dir = (touch.position.x > Screen.width / 2 ? 1 : -1);
         }
 #endif
         if (dir < 0) isLeft = true;

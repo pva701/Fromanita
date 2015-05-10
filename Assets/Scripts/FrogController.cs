@@ -7,7 +7,7 @@ public class FrogController : MonoBehaviour {
     private float inverseMoveTime;
     private Animator animator;
     private Rigidbody2D rb2D;
-    private float STEP_FORCE = 20.0f;
+    private float STEP_FORCE = 10.0f;
 
 	void Awake() {
         inverseMoveTime = 1.0f / moveTime;
@@ -27,7 +27,7 @@ public class FrogController : MonoBehaviour {
         {
             print("ground");
             //TODO write check if bounds
-            GameManager.instance.GameOver();
+            //GameManager.instance.GameOver();
         } else
         {
             print("amanita");
@@ -40,8 +40,9 @@ public class FrogController : MonoBehaviour {
         else if (InputManager.instance.isRight) MoveByX(STEP_FORCE);
 	}
 
-    public void DieAnimation()
+    public void Die()
     {
+        enabled = false;
         animator.SetTrigger("frogDie");
     }
 }
