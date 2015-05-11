@@ -27,7 +27,7 @@ public class FrogController : MonoBehaviour {
         {
             print("ground");
             //TODO write check if bounds
-            //GameManager.instance.GameOver();
+            GameManager.instance.GameOver();
         } else
         {
             print("amanita");
