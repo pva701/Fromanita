@@ -25,11 +25,11 @@ public class FrogController : MonoBehaviour {
     {
         if (collision.gameObject.name == "Ground")
         {
-            print("ground");
+            //print("ground");
             GameManager.instance.GameOver();
         } else if (collision.gameObject.name == "Amanita")
         {
-            print("amanita");
+            //print("amanita");
             animator.SetTrigger("frogJump");
         }
     }

@@ -83,6 +83,6 @@ public class GameManager : MonoBehaviour
                 xMin = Mathf.Min(xMin, pnt.x + walls.transform.position.x);
                 xMax = Mathf.Max(xMax, pnt.x + walls.transform.position.x);
             }
-        return new Rect(xMin, yMax, xMax - xMin, yMax - yMin);
+        return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
     }
 }
