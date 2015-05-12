@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance = null;
     public float gameOverDelay = 1.0f;
     public float generateNextMosquitoDelay = 10.0f;
-    public float timeLiveMosquito = 2.0f;
+    public float timeLiveMosquito = 3.0f;
 
     public GameObject amanita;
     public GameObject frog;
@@ -58,12 +58,9 @@ public class GameManager : MonoBehaviour
         {
             //MosquitoController controller = new MosquitoController();
             //MosquitoController controller = prefabMosquito.GetComponent<MosquitoController>();
-            MosquitoRouteGenerator routeGenerator = new MosquitoRouteGenerator(0.05f, timeLiveMosquito);
-            if (routeGenerator == null)
-                print("route gen is null when cr");
-            GameObject instance = Instantiate(prefabMosquito, routeGenerator.StartPoint(), Quaternion.identity) as GameObject;
+            GameObject instance = Instantiate(prefabMosquito) as GameObject;
             MosquitoController controller = instance.GetComponent<MosquitoController>();
-            controller.routeGenerator = routeGenerator;
+            controller.liveTime = timeLiveMosquito;
             controller.StartMoving();
             yield return new WaitForSeconds(generateNextMosquitoDelay);
         }

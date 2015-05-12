@@ -43,7 +43,7 @@ public class AmanitaController : MonoBehaviour {
 		}
 		Vector3 np = Vector3.MoveTowards(rb.position, end, inverseMoveTime * Time.deltaTime);
 		rb.MovePosition(np);
-		print (np);
+		//print (np);
 	}
 
     public void StopMoving()
