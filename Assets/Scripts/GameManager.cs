@@ -4,15 +4,18 @@ using System.Collections;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance = null;
+
     public float gameOverDelay = 1.0f;
-    public float generateNextMosquitoDelay = 10.0f;
-    public float timeLiveMosquito = 3.0f;
 
     public GameObject amanita;
     public GameObject frog;
     public GameObject ground;
     public GameObject prefabMosquito;
+    public GameObject walls;
 
+
+    private float generateNextMosquitoDelay = 5.0f;
+    private float timeLiveMosquito = 3.0f;
     private bool isDie = false;
     private Vector3 frogPosition;
     private Vector3 amanitaPosition;
@@ -52,7 +55,7 @@ public class GameManager : MonoBehaviour
         isDie = true;
     }
 
-    IEnumerator StartMosquito()
+    private IEnumerator StartMosquito()
     {
         for (; ; )
         {
@@ -60,10 +63,26 @@ public class GameManager : MonoBehaviour
             //MosquitoController controller = prefabMosquito.GetComponent<MosquitoController>();
             GameObject instance = Instantiate(prefabMosquito) as GameObject;
             MosquitoController controller = instance.GetComponent<MosquitoController>();
-            controller.liveTime = timeLiveMosquito;
-            controller.StartMoving();
+            controller.StartMoving(timeLiveMosquito);
             yield return new WaitForSeconds(generateNextMosquitoDelay);
         }
     }
 
+    public Rect GetFieldRect()
+    {
+        EdgeCollider2D groundCollider = ground.GetComponent<EdgeCollider2D>();
+        EdgeCollider2D[] colliders = walls.GetComponents<EdgeCollider2D>();
+        float yMin = groundCollider.points[0].y + ground.transform.position.y;
+        float yMax = groundCollider.points[0].y + ground.transform.position.y;
+        float xMin = Mathf.Min(groundCollider.points[0].x, groundCollider.points[1].x) + ground.transform.position.x;
+        float xMax = Mathf.Max(groundCollider.points[0].x, groundCollider.points[1].x) + ground.transform.position.x;
+        for (int i = 0; i < colliders.Length; ++i)
+            for (int j = 0; j < colliders[i].points.Length; ++j) {
+                Vector2 pnt = colliders[i].points[j];
+                yMax = Mathf.Max(yMax, pnt.y + walls.transform.position.y);
+                xMin = Mathf.Min(xMin, pnt.x + walls.transform.position.x);
+                xMax = Mathf.Max(xMax, pnt.x + walls.transform.position.x);
+            }
+        return new Rect(xMin, yMax, xMax - xMin, yMax - yMin);
+    }
 }

@@ -26,13 +26,19 @@ public class FrogController : MonoBehaviour {
         if (collision.gameObject.name == "Ground")
         {
             print("ground");
-            //TODO write check if bounds
             GameManager.instance.GameOver();
-        } else
+        } else if (collision.gameObject.name == "Amanita")
         {
             print("amanita");
             animator.SetTrigger("frogJump");
         }
+    }
+
+    void OnTriggerEnter2D(Collider2D collider)
+    {
+        //TODO write add score
+        if (collider.gameObject.tag == "Mosquito")
+            DestroyObject(collider.gameObject);
     }
 
 	void Update () {

@@ -4,7 +4,6 @@ using System.Collections;
 public class MovingMosquito : MonoBehaviour {
 
     public float moveTime = 0.1f;
-    public float liveTime;
 
     private float y;
     private Vector2 startPoint;
@@ -13,17 +12,19 @@ public class MovingMosquito : MonoBehaviour {
     private int totalIterations;
     private int curIteration = 0;
     private Rigidbody2D rg2D;
-    
+    private float liveTime;
+
     void Awake() {
          rg2D = GetComponent<Rigidbody2D>();
     }
 
-    public void StartMoving()
+    public void StartMoving(float liveTime)
     {
         y = Random.Range(3.0f, 7.5f);
-        transform.position =  new Vector2(-2.34f, y);
+        print("xMin = " + GameManager.instance.GetFieldRect().xMin);
+        transform.position =  new Vector2(GameManager.instance.GetFieldRect().xMin, y);
         //int it = (int)(liveTime / moveTime);
-        rg2D.velocity = new Vector2((5.64f + 2.34f) / liveTime, 0);
+        //rg2D.velocity = new Vector2((5.64f + 2.34f) / liveTime, 0);
         //StartCoroutine(Move());
     }
 
