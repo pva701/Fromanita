@@ -43,6 +43,7 @@ public class FrogController : MonoBehaviour {
     public void Die()
     {
         enabled = false;
-        animator.SetTrigger("frogDie");
+        //animator.SetTrigger("frogDie");
+        //TODO will good
     }
 }
