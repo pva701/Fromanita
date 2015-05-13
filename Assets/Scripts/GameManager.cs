@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
 
 
     private float generateNextMosquitoDelay = 5.0f;
-    private float timeLiveMosquito = 3.0f;
+    private float timeLiveMosquito = 5.0f;
     private bool isDie = false;
     private Vector3 frogPosition;
     private Vector3 amanitaPosition;
@@ -72,16 +72,14 @@ public class GameManager : MonoBehaviour
     {
         EdgeCollider2D groundCollider = ground.GetComponent<EdgeCollider2D>();
         EdgeCollider2D[] colliders = walls.GetComponents<EdgeCollider2D>();
-        float yMin = groundCollider.points[0].y + ground.transform.position.y;
-        float yMax = groundCollider.points[0].y + ground.transform.position.y;
-        float xMin = Mathf.Min(groundCollider.points[0].x, groundCollider.points[1].x) + ground.transform.position.x;
-        float xMax = Mathf.Max(groundCollider.points[0].x, groundCollider.points[1].x) + ground.transform.position.x;
+        float yMin = groundCollider.points[0].y + ground.transform.position.y - groundCollider.offset.y;
+        float yMax = groundCollider.points[0].y + ground.transform.position.y - groundCollider.offset.y;
+        float xMin = Mathf.Min(groundCollider.points[0].x, groundCollider.points[1].x) + ground.transform.position.x - groundCollider.offset.x;
+        float xMax = Mathf.Max(groundCollider.points[0].x, groundCollider.points[1].x) + ground.transform.position.x - groundCollider.offset.x;
         for (int i = 0; i < colliders.Length; ++i)
             for (int j = 0; j < colliders[i].points.Length; ++j) {
                 Vector2 pnt = colliders[i].points[j];
-                yMax = Mathf.Max(yMax, pnt.y + walls.transform.position.y);
-                xMin = Mathf.Min(xMin, pnt.x + walls.transform.position.x);
-                xMax = Mathf.Max(xMax, pnt.x + walls.transform.position.x);
+                yMax = Mathf.Max(yMax, pnt.y + walls.transform.position.y - colliders[i].offset.y);
             }
         return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
     }
