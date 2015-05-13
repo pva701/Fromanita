@@ -14,8 +14,8 @@ public class GameManager : MonoBehaviour
     public GameObject walls;
 
 
-    private float generateNextMosquitoDelay = 5.0f;
-    private float timeLiveMosquito = 5.0f;
+    private float generateNextMosquitoDelay = 10.0f;
+    private float timeLiveMosquito = 10.0f;
     private bool isDie = false;
     private Vector3 frogPosition;
     private Vector3 amanitaPosition;
