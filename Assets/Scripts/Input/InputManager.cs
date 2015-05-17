@@ -14,6 +14,9 @@ public class InputManager : MonoBehaviour {
     public bool isDown;
     public int dirVert;
 
+    private bool mobileOutGround = false;
+    private Vector2 mobileStartTouch;
+
 	void Awake () {
         if (instance == null)
             instance = this;
@@ -27,7 +30,8 @@ public class InputManager : MonoBehaviour {
         isLeft = false;
         isRight = false;
         isDown = false;
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+//#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+#if UNITY_STANDALONE || UNITY_WEBPLAYER
         dirHoriz = (int)Input.GetAxis("Horizontal");
         dirVert = (int)Input.GetAxis("Vertical");
         if (dirVert > 0) dirVert = 0;
@@ -35,7 +39,23 @@ public class InputManager : MonoBehaviour {
 #else
         if (Input.touchCount > 0) {
             Touch touch = Input.touches[0];
-            dir = (touch.position.x > Screen.width / 2 ? 1 : -1);
+            if (touch.phase == TouchPhase.Began)
+            {
+                if (touch.position.y > 100)
+                {
+                    mobileOutGround = true;
+                    mobileStartTouch = touch.position;
+                }
+            }
+
+            if (!mobileOutGround) {
+                if (touch.position.y <= 100)
+                    dirHoriz = (touch.position.x > Screen.width / 2 ? 1 : -1);
+            } else if (touch.phase == TouchPhase.Ended)
+            {
+                mobileOutGround = false;
+                if (touch.position.y - mobileStartTouch.y < 0) isDown = true;
+            }
         }
 #endif
         if (dirHoriz < 0) isLeft = true;
