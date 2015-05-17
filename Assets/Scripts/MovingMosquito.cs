@@ -28,7 +28,6 @@ public class MovingMosquito : MonoBehaviour {
         if (queueTrajectory.Count == 0)
             return;
         liveTime -= Time.deltaTime;
-        //print("live = " + liveTime);
         if (transform.position.x < boundRect.xMin || transform.position.x > boundRect.xMax || transform.position.y > boundRect.yMax) {
             //print("destroy");
             Destroy(gameObject);
@@ -202,7 +201,6 @@ public class MovingMosquito : MonoBehaviour {
         ans = new Vector2();
         if (Mathf.Abs(cp) < EPS)
             return false;
-        float t2 = CrossProduct(d1, a - c) / cp;
         float t1 = CrossProduct(d2, a - c) / cp;
         ans = a + d1 * t1;
         return true;

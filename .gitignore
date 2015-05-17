@@ -3,5 +3,4 @@
 *.sln
 *.csproj
 /Temp
-/ProjectSettings
 *.suo
