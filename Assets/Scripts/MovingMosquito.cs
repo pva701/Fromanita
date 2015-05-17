@@ -4,21 +4,93 @@ using System.Collections.Generic;
 using Random = UnityEngine.Random;
 
 public class MovingMosquito : MonoBehaviour {
-
-    private float changeVelocityTime = 0.1f;
     private Rigidbody2D rg2D;
-    private float y;
     private float liveTime;
     private Rect boundRect;
-    private int ANGLE_RANGE = 15;
     private Vector2 leftDown;
     private Vector2 leftTop;
     private Vector2 rightDown;
     private Vector2 rightTop;
-    private float EPS = 0.0001f;
+    private float EPS = 0.00001f;
+    public float SPEED = 2f;
+    private Queue<ITrajectory> queueTrajectory = new Queue<ITrajectory>();
 
     void Awake() {
-         rg2D = GetComponent<Rigidbody2D>();
+        rg2D = GetComponent<Rigidbody2D>();
+    }
+
+    void Start()
+    {
+    }
+
+    void Update()
+    {
+        if (queueTrajectory.Count == 0)
+            return;
+        liveTime -= Time.deltaTime;
+        //print("live = " + liveTime);
+        if (transform.position.x < boundRect.xMin || transform.position.x > boundRect.xMax || transform.position.y > boundRect.yMax) {
+            //print("destroy");
+            Destroy(gameObject);
+        } if (liveTime < 0 && liveTime + Time.deltaTime > 0) {
+            ITrajectory traj = queueTrajectory.Peek();
+            if (traj.HasNext() && traj.NextPoint(Time.deltaTime).x - transform.position.x > 0)
+                rg2D.velocity = new Vector2(SPEED, 0);
+            else
+                rg2D.velocity = new Vector2(-SPEED, 0);
+        } else if (queueTrajectory.Count > 0 && liveTime >= 0) {
+            if (!queueTrajectory.Peek().HasNext()) queueTrajectory.Dequeue();
+            //print("size after = " + queueTrajectory.Count);
+            if (queueTrajectory.Count == 1) ContinueTrajectory();
+            ITrajectory trajectory = queueTrajectory.Peek();
+            Vector2 newPos = trajectory.NextPoint(Time.deltaTime);
+            transform.position = newPos;
+            //print("pos = " + newPos + " xMax = " + boundRect.xMax);
+        }   
+    }
+
+    private void ContinueTrajectory()
+    {
+        ITrajectory trajectory = queueTrajectory.Dequeue();
+        Vector2 p1 = trajectory.EndPoint();
+        Vector2 p2 = trajectory.StartPoint();
+        //Vector2 p3 = RandPointInRect();
+        Vector2 p3 = RandPointInSector(p1, p2);
+        //print("p1 = " + p1 + " p2 = " + p2 + " p3 = " + p3);
+
+        float maxLen = Mathf.Min((p2 - p1).magnitude, (p3 - p1).magnitude) * 0.5f;
+        float len = 0;
+        if (maxLen < 1.0f)
+            len = maxLen;
+        else
+            len = Random.Range(1f, maxLen);
+
+        float frac1 = len / (p2 - p1).magnitude;
+        float frac2 = len / (p3 - p1).magnitude;
+        //print("frac1 = " + frac1 + " frac2 = " + frac2);
+        float speed = SPEED;
+        Vector2 a = p1 + (p2 - p1) * frac1;
+        Vector2 b = p1 + (p3 - p1) * frac2;
+        //print("a = " + a + " b = " + b);
+        //if (CrossProduct(p2 - p1, p3 - p1) >= 0) speed *= -1;
+        Vector2 center;
+        IntersectLines(a, a + new Vector2(p2.y - p1.y, -(p2.x - p1.x)), b, b + new Vector2(p3.y - p1.y, -(p3.x - p1.x)), out center);
+        float radius = Mathf.Abs(CrossProduct(p2 - p1, center - p1)) / (p2 - p1).magnitude;
+        float fromAngle = Mathf.Atan2((a - center).y, (a - center).x);
+        float toAngle = Mathf.Atan2((b - center).y, (b - center).x);
+        if (fromAngle < 0) fromAngle += 2 * Mathf.PI;
+        if (toAngle < 0) toAngle += 2 * Mathf.PI;
+        float angle = (fromAngle + toAngle) * 0.5f;
+        if (!InTriangle(a, b, p1, center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius)) {
+            if (toAngle < fromAngle)
+                toAngle += 2 * Mathf.PI;
+            else
+                toAngle -= 2 * Mathf.PI;
+        }
+        queueTrajectory.Enqueue(new LineTrajectory(p2, a, SPEED));
+        //print("frm to " + fromAngle + " " + toAngle + " " + radius + " cent = " + center);
+        queueTrajectory.Enqueue(new CircleTrajectory(fromAngle, toAngle, speed, new Circle(center, radius)));
+        queueTrajectory.Enqueue(new LineTrajectory(b, p3, SPEED));
     }
 
     public void StartMoving(float liveTime)
@@ -26,89 +98,76 @@ public class MovingMosquito : MonoBehaviour {
         this.liveTime = liveTime;
         Rect rect = GameManager.instance.GetFieldRect();
         Random.seed = System.DateTime.Now.Millisecond;
-        print("rect = " + rect.yMax);
-        y = Random.Range(rect.yMin + 2, rect.yMax);
-        print("y start = " + y);
-        //print("XMA = " + rect.xMax);
         boundRect = new Rect(rect.xMin, rect.yMin + 2, rect.xMax - rect.xMin, rect.yMax - rect.yMin - 2);
         leftDown = new Vector2(boundRect.xMin, boundRect.yMin);
         leftTop = new Vector2(boundRect.xMin, boundRect.yMax);
         rightDown = new Vector2(boundRect.xMax, boundRect.yMin);
         rightTop = new Vector2(boundRect.xMax, boundRect.yMax);
-        print("yMin = " + leftDown.y);
-        print("xMax = " + rightDown.x);
 
-        Vector2 ans;
-        print("rightDown = " + rightDown);
-        print("rightTop = " + rightTop);
-        print("dist = " + FindMinDist(new Vector2(-0.4f, 1.6f), new Vector2(-0.4f, 1.6f) + new Vector2(0.8f, -1.8f)));
-        if (LineIntersectionPoint(new Vector2(0.2f, 1.9f), new Vector2(0.2f, 1.9f) + new Vector2(0.9f, -0.5f), leftDown, rightDown, out ans))
-        {
-            print("ans = " + ans);
-        }
-        else print("Not Int");
-
-        transform.position = new Vector2(rect.xMin, y);
-        StartCoroutine(ChangeVelocity());
+        //print("a = " + a + " b = " + b + " center = " + center);
+        //print("p1 = " + p1 + " p2 = " + p2 + " p3 = " + p3);
+        Vector2 p2 = new Vector2(boundRect.xMin, Random.Range(boundRect.yMin, boundRect.yMax));
+        Vector2 p1 = RandPointInRect();
+        transform.position = p2;
+        queueTrajectory.Enqueue(new LineTrajectory(p2, p1, SPEED));
+        ContinueTrajectory();
     }
 
-    private IEnumerator ChangeVelocity()
+    private Vector2 getBisector(Vector2 a, Vector2 b)
     {
-        float currentTime = 0;
-        rg2D.velocity = new Vector2(2f, 0f);
-        float lenVelocity = rg2D.velocity.magnitude;
-        Vector2 currentPosition = transform.position;
-        int bigRotateLen = 0;
-        while (currentTime < liveTime)
-        {
-            int angGrad; 
-            if (bigRotateLen == 0)
-                angGrad = GetRandomAngle2(-ANGLE_RANGE, ANGLE_RANGE, lenVelocity);
-            else if (bigRotateLen < 0) {
-                ++bigRotateLen;
-                angGrad = GetRandomAngle2(-ANGLE_RANGE, 0, lenVelocity);
-            } else
-            {
-                --bigRotateLen;
-                angGrad = GetRandomAngle2(0, ANGLE_RANGE, lenVelocity);
-            }
+        return (a * b.magnitude + b * a.magnitude) / (2 * a.magnitude * b.magnitude);
+    }
 
-            float angle =  angGrad / 180.0f * Mathf.PI;
-            //Debug.Log("angGrad = " + angGrad);
-            Vector2 st = transform.position;
-            float ds = FindMinDist(st, st + turnRad(rg2D.velocity, angle));
-            //Debug.Log("DS = " + ds);
-            if (lenVelocity <= ds &&  ds <= 2 * lenVelocity)
-            {
-                if (angGrad < 0) bigRotateLen = -Random.Range(5, 10);
-                else bigRotateLen = Random.Range(5, 10);
-            } else if (ds < lenVelocity)
-            {
-                float c1 = (90.0f - 2 * ANGLE_RANGE) / ANGLE_RANGE;
-                float coef = c1 * (1 - ds / lenVelocity);
-                int ang = (int)(2 * ANGLE_RANGE + c1 * ANGLE_RANGE);
+    private Circle getInnerCircle(Vector2 a, Vector2 b, Vector2 c)
+    {
+        Vector2 vecBisector1 = getBisector(b - a, c - a);
+        Vector2 vecBisector2 = getBisector(a - b, c - b);
+        Vector2 center;
+        IntersectLines(a, a + vecBisector1, b, b + vecBisector2, out center);
+        return new Circle(center, Mathf.Abs(CrossProduct(center - a, b - a)) / (b - a).magnitude);
+    }
 
-                //print("ang = " + ang + " ds = " + ds);
-                angGrad = GetRandomAngle2(-90, 90, lenVelocity);
-                angle = angGrad / 180.0f * Mathf.PI;
-                //print("angGrad = " + angGrad);
-                ds = FindMinDist(st, st + turnRad(rg2D.velocity, angle));
-                bigRotateLen = 0;
-            }
+    private Vector2 RandPointInRect()
+    {
+        float x = Random.Range(boundRect.xMin, boundRect.xMax);
+        float y = Random.Range(boundRect.yMin, boundRect.yMax);
+        return new Vector2(x, y);
+    }
 
-            rg2D.velocity = turnRad(rg2D.velocity, angle) * Mathf.Min(lenVelocity, ds) / rg2D.velocity.magnitude;
-            //print("vel = " + rg2D.velocity);
-            yield return new WaitForSeconds(changeVelocityTime);
-            currentTime += changeVelocityTime;
+    private bool InTriangle(Vector2 a, Vector2 b, Vector2 c, Vector2 p)
+    {
+        float p1 = CrossProduct(b - a, p - a);
+        float p2 = CrossProduct(c - b, p - b);
+        float p3 = CrossProduct(a - c, p - c);
+        return p1 >= 0 && p2 >= 0 && p3 >= 0 || p1 <= 0 && p2 <= 0 && p3 <= 0;
+    }
 
-            if (bigRotateLen == 0) // && Random.Range(0, 4) == 0)
-                bigRotateLen = Random.Range(-20, 20);
-        }
-        if (rg2D.velocity.x < 0)
-            rg2D.velocity = new Vector2(-1, Mathf.Sqrt(lenVelocity * lenVelocity - 1));
+    public Vector2 RandPointInSector(Vector2 a, Vector2 b) {
+        float MIN_ANGLE = Mathf.PI / 4;
+        float angle = Mathf.Atan2((b - a).y, (b - a).x);
+        if (angle < 0) angle += 2 * Mathf.PI;
+        float angleRes = 0;
+        float minDist = 0;
+        int it = 0;
+        do {
+            ++it;
+            if (it > 10) break;
+            angleRes = Random.Range(angle + MIN_ANGLE, angle - MIN_ANGLE + 2 * Mathf.PI);
+            minDist = FindMinDist(a, a + new Vector2(Mathf.Cos(angleRes), Mathf.Sin(angleRes)));
+            //print("md = " + minDist);
+        } while (minDist < 0.3f);
+
+        if (Mathf.Abs(minDist) < EPS)
+            Destroy(gameObject);
+        //print("minDist = " + minDist);
+        float radius = 0;
+        float bound = 2f;
+        if (minDist > bound)
+            radius = Random.Range(bound, Mathf.Min(3f, minDist));
         else
-            rg2D.velocity = new Vector2(1, Mathf.Sqrt(lenVelocity * lenVelocity - 1));
-        print("EXIT FROM CHANGE");
+            radius = minDist;
+        //print("angleRes = " + angleRes + " rad = " + radius);
+        return a + new Vector2(Mathf.Cos(angleRes), Mathf.Sin(angleRes)) * radius;
     }
 
     private Rect IntersectRects(Rect a, Rect b)
@@ -118,36 +177,14 @@ public class MovingMosquito : MonoBehaviour {
         return new Rect(x, y, Mathf.Min(a.xMax, b.xMax) - x, Mathf.Min(a.yMax, b.yMax) - y);
     }
 
-    private int GetRandomAngle2(int leftAngle, int rightAngle, float lenVelocity)
-    {
-        List<int> a = new List<int>();
-        float mx = 0;
-        int ret = 0;
-        Vector2 start = transform.position;
-        for (int i = leftAngle; i <= rightAngle; ++i)
-        {
-            float ang = i / 180.0f * Mathf.PI;
-            Vector2 end = start + turnRad(rg2D.velocity, ang);
-            float d = FindMinDist(start, end);
-            if (d > mx) {
-                mx = d;
-                ret = i;
-            }
-            if (d >= lenVelocity) a.Add(i);
-        }
-        if (a.Count == 0)
-            return ret;
-        return a[Random.Range(0, a.Count)];
-    }
-
     private float FindMinDist(Vector2 start, Vector2 end)
     {
         Vector2 ans;
         float dist = 1000000f;
-        if (LineIntersectionPoint(start, end, leftTop, leftDown, out ans)) dist = Mathf.Min(Vector2.Distance(ans, start), dist);
-        if (LineIntersectionPoint(start, end, leftDown, rightDown, out ans)) dist = Mathf.Min(Vector2.Distance(ans, start), dist);
-        if (LineIntersectionPoint(start, end, rightDown, rightTop, out ans)) dist = Mathf.Min(Vector2.Distance(ans, start), dist);
-        if (LineIntersectionPoint(start, end, rightTop, leftTop, out ans)) dist = Mathf.Min(Vector2.Distance(ans, start), dist);
+        if (IntersectSegmentAndRay(start, end, leftTop, leftDown, out ans)) dist = Mathf.Min(Vector2.Distance(ans, start), dist);
+        if (IntersectSegmentAndRay(start, end, leftDown, rightDown, out ans)) dist = Mathf.Min(Vector2.Distance(ans, start), dist);
+        if (IntersectSegmentAndRay(start, end, rightDown, rightTop, out ans)) dist = Mathf.Min(Vector2.Distance(ans, start), dist);
+        if (IntersectSegmentAndRay(start, end, rightTop, leftTop, out ans)) dist = Mathf.Min(Vector2.Distance(ans, start), dist);
         
         if (dist > 1e3)
         {
@@ -157,19 +194,21 @@ public class MovingMosquito : MonoBehaviour {
         return dist;
     }
 
-    private Vector2 turnRad(Vector2 v, float angle)
+    private bool IntersectLines(Vector2 a, Vector2 b, Vector2 c, Vector2 d, out Vector2 ans)//я в ахуе
     {
-        float x = v.x * Mathf.Cos(angle) - v.y * Mathf.Sin(angle);
-        float y = v.y * Mathf.Cos(angle) + v.x * Mathf.Sin(angle);
-        return new Vector2(x, y);
+        Vector2 d1 = b - a;
+        Vector2 d2 = d - c;
+        float cp = CrossProduct(d1, d2);
+        ans = new Vector2();
+        if (Mathf.Abs(cp) < EPS)
+            return false;
+        float t2 = CrossProduct(d1, a - c) / cp;
+        float t1 = CrossProduct(d2, a - c) / cp;
+        ans = a + d1 * t1;
+        return true;
     }
 
-    private Vector2 turnGrad(Vector2 v, float angle)
-    {
-        return turnRad(v, angle / 180.0f * Mathf.PI);
-    }
-
-    private bool LineIntersectionPoint(Vector2 a, Vector2 b, Vector2 c, Vector2 d, out Vector2 ans)//я в ахуе
+    private bool IntersectSegmentAndRay(Vector2 a, Vector2 b, Vector2 c, Vector2 d, out Vector2 ans)//я в ахуе
     {
         Vector2 d1 = b - a;
         Vector2 d2 = d - c;
@@ -186,7 +225,8 @@ public class MovingMosquito : MonoBehaviour {
             ans = a;
             return true;
         }
-        if (t1 >= 0 && t2 >= 0 && t2 <= 1) {
+        if (t1 >= 0 && t2 >= 0 && t2 <= 1)
+        {
             ans = a + d1 * t1;
             return true;
         }
@@ -197,71 +237,109 @@ public class MovingMosquito : MonoBehaviour {
         return a.x * b.y - a.y * b.x;
     }
 
-    /*
-     * private int GetRandomAngle(int leftAngle, int rightAngle)
+    public abstract class ITrajectory
     {
-        float p = Random.Range(0f, 1.0f);
-        float s = 0, sm = 0;
-        int n = rightAngle - leftAngle + 1;
-        float[] probs = GetProbablies(leftAngle, rightAngle);
-        for (int i = 0; i < n; ++i) sm += probs[i];
-        if (Mathf.Abs(sm) < EPS)
-            return 180 - Random.Range(-10, 10);
+        public abstract bool HasNext();
+        public abstract Vector2 StartPoint();
+        public abstract Vector2 EndPoint();
+        public abstract Vector2 NextPoint(float delta);
+    }
 
-        for (int i = 0; i < n; ++i)
+    public class Circle
+    {
+        public Vector2 center;
+        public float radius;
+        public Circle(Vector2 c, float r)
         {
-            s += probs[i];
-            if (s >= p) return i + leftAngle;
+            center = c;
+            radius = r;
         }
-        return rightAngle;
-    }*/
+    }
 
-    /*Rect intersect = IntersectRects(boundRect, new Rect(currentPosition.x - 3, currentPosition.y - 3, 6, 6));
-
-Vector2 to = new Vector2(Random.Range(intersect.xMin, intersect.xMax),
-                         Random.Range(intersect.yMin, intersect.yMax));
-//Vector2 to = currentPosition + new Vector2(Mathf.Cos(angleTo), Mathf.Sin(angleTo));
-//float len = Random.Range(2f, 0.4f) * (currentPosition - to).magnitude;
-print("cur pos = " + currentPosition);
-while (currentTime < liveTime && Vector2.Distance(currentPosition, to) > 0.1) 
-{
-    int angle = Random.Range(-30, 30);
-    float cDist = (to - currentPosition).magnitude;
-    if (cDist < lenVelocity)
-        rg2D.velocity = to - currentPosition;
-    else
-        rg2D.velocity = turn((to - currentPosition) / lenVelocity, angle);
-    yield return new WaitForSeconds(changeVelocityTime);
-    currentPosition = rg2D.transform.position;
-    currentTime += changeVelocityTime;
-    print("cur = " + currentPosition + " to = " + to);
-}*/
-
-    /*
-     * private float[] GetProbablies(int leftAngle, int rightAngle)
+    public class CircleTrajectory : ITrajectory
     {
-        float[] probs = new float[rightAngle - leftAngle + 1];
-        Vector2 start = transform.position;
+        private float fromAngle;
+        private float toAngle;
+        private float angleSpeed;
+        private float currentAngle;
+        private Circle circle;
 
-        for (int i = leftAngle; i <= rightAngle; ++i)
+        public CircleTrajectory(float fromAngle, float toAngle, float speed, Circle circle)
         {
-            float ang = i / 180.0f * Mathf.PI;
-            Vector2 end = start + new Vector2(Mathf.Cos(ang), Mathf.Sin(ang));
-            int j = i - leftAngle;
-            probs[j] = FindMinDist(start, end);
+            this.circle = circle;
+            this.fromAngle = fromAngle;
+            this.toAngle = toAngle;
+            currentAngle = fromAngle;
+            this.circle = circle;
+            float t = Mathf.Abs(toAngle - fromAngle) * circle.radius / speed;
+            this.angleSpeed = (toAngle - fromAngle) / t;
         }
 
-        float sm = 0;
-        int n = rightAngle - leftAngle + 1;
-        for (int i = 0; i < n; ++i)
-            if (probs[i] > 0)
-                sm += probs[i];
+        public override bool HasNext()
+        {
+            return Mathf.Abs(currentAngle - toAngle) > 0.001;
+        }
 
-        for (int i = 0; i < n; ++i)
-            if (Mathf.Abs(probs[i]) > EPS)
-                probs[i] = probs[i] / sm;
+        public override Vector2 NextPoint(float delta)
+        {
+            if (angleSpeed > 0)
+                currentAngle = Mathf.Min(toAngle, currentAngle + angleSpeed * delta);
             else
-                probs[i] = 0;
-        return probs;
-    }*/
+                currentAngle = Mathf.Max(toAngle, currentAngle + angleSpeed * delta);
+            return getPointOnCircle(currentAngle);
+        }
+
+        private Vector2 getPointOnCircle(float angle)
+        {
+            return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * circle.radius + circle.center;
+        }
+
+        public override Vector2 StartPoint()
+        {
+            return getPointOnCircle(fromAngle);
+        }
+
+        public override Vector2 EndPoint()
+        {
+            return getPointOnCircle(toAngle);
+        }
+    }
+
+    public class LineTrajectory : ITrajectory
+    {
+        private Vector2 start;
+        private Vector2 end;
+        private float speed;
+        private Vector2 currentPoint;
+
+        public LineTrajectory(Vector2 a, Vector2 b, float speed)
+        {
+            this.start = a;
+            this.end = b;
+            this.speed = speed;
+            this.currentPoint = a;
+        }
+
+        public override bool HasNext()
+        {
+            return (end - currentPoint).magnitude > 0.001;
+        }
+
+        public override Vector2 NextPoint(float delta)
+        {
+            currentPoint = Vector2.MoveTowards(currentPoint, end, delta * speed);
+            return currentPoint;
+        }
+
+        public override Vector2 StartPoint()
+        {
+            return start;
+        }
+
+        public override Vector2 EndPoint()
+        {
+            return end;
+        }
+    }
+
 }
