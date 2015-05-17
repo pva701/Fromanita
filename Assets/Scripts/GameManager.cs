@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (isDie && InputManager.instance.dir != 0)
+        if (isDie && InputManager.instance.dirHoriz != 0)
         {
             //TODO change it
             frog.transform.position = frogPosition;

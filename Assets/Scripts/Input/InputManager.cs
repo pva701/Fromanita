@@ -10,7 +10,9 @@ public class InputManager : MonoBehaviour {
 
     public bool isLeft; //{ get; }
     public bool isRight; //{ get; }
-    public int dir;// {get;}
+    public int dirHoriz;// {get;}
+    public bool isDown;
+    public int dirVert;
 
 	void Awake () {
         if (instance == null)
@@ -21,18 +23,23 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void Update () {
-        dir = 0;
+        dirHoriz = 0;
         isLeft = false;
         isRight = false;
+        isDown = false;
 #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
-        dir = (int)Input.GetAxis("Horizontal");
+        dirHoriz = (int)Input.GetAxis("Horizontal");
+        dirVert = (int)Input.GetAxis("Vertical");
+        if (dirVert > 0) dirVert = 0;
+        if (dirVert != 0 && dirHoriz != 0) dirVert = 0;
 #else
         if (Input.touchCount > 0) {
             Touch touch = Input.touches[0];
             dir = (touch.position.x > Screen.width / 2 ? 1 : -1);
         }
 #endif
-        if (dir < 0) isLeft = true;
-        else if (dir > 0) isRight = true;
+        if (dirHoriz < 0) isLeft = true;
+        else if (dirHoriz > 0) isRight = true;
+        else if (dirVert < 0) isDown = true;
 	}
 }

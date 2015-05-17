@@ -96,6 +96,7 @@ public class MovingMosquito : MonoBehaviour {
     {
         this.liveTime = liveTime;
         Rect rect = GameManager.instance.GetFieldRect();
+        print("yMax = " + rect.yMax);
         Random.seed = System.DateTime.Now.Millisecond;
         boundRect = new Rect(rect.xMin, rect.yMin + 2, rect.xMax - rect.xMin, rect.yMax - rect.yMin - 2);
         leftDown = new Vector2(boundRect.xMin, boundRect.yMin);

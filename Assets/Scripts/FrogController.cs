@@ -4,13 +4,11 @@ using System.Collections;
 public class FrogController : MonoBehaviour {
     public float moveTime;
 
-    private float inverseMoveTime;
     private Animator animator;
     private Rigidbody2D rb2D;
     private float STEP_FORCE = 10.0f;
 
 	void Awake() {
-        inverseMoveTime = 1.0f / moveTime;
         animator = GetComponent<Animator>();
         rb2D = GetComponent<Rigidbody2D>();
 	}
@@ -18,7 +16,7 @@ public class FrogController : MonoBehaviour {
 
     void MoveByX(float xForce)
     {
-        rb2D.AddForce(new Vector2(xForce, 0));
+        
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -42,8 +40,13 @@ public class FrogController : MonoBehaviour {
     }
 
 	void Update () {
-        if (InputManager.instance.isLeft) MoveByX(-STEP_FORCE);
-        else if (InputManager.instance.isRight) MoveByX(STEP_FORCE);
+        if (InputManager.instance.isLeft) rb2D.AddForce(new Vector2(-STEP_FORCE, 0));
+        else if (InputManager.instance.isRight) rb2D.AddForce(new Vector2(STEP_FORCE, 0));
+        else if (InputManager.instance.isDown)
+        {
+            //print("down");
+            rb2D.AddForce(new Vector2(0, -STEP_FORCE*2));
+        }
 	}
 
     public void Die()
