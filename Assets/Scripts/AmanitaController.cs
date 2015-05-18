@@ -11,6 +11,7 @@ public class AmanitaController : MonoBehaviour {
 	private float inverseMoveTime;
 	private int dir = 1;
 	private int counter = 0;
+
 	void Start () {
 		rb = GetComponent<Rigidbody2D> ();
 		boxCollider = GetComponent<BoxCollider2D> ();
@@ -35,12 +36,17 @@ public class AmanitaController : MonoBehaviour {
 		//return;
 		if (collision.gameObject.name == "Wall")
 		{
-            print("WALL");
+            //print("WALL");
 			ChangeDirection();
 		} else if (collision.gameObject.name == "Stump")
 		{
 			ChangeDirection();
-		} 
+        }
+        else if (collision.gameObject.name == "Frog")
+        {
+            if (rb.velocity.x > 0) rb.velocity = new Vector2(1, 0);
+            else rb.velocity = new Vector2(-1, 0);
+        }
 	}
 
 	private void ChangeDirection() {
@@ -48,7 +54,7 @@ public class AmanitaController : MonoBehaviour {
 		tmp.x *= -1;
 		dir *= -1;
 		transform.localScale = tmp;
-        rb.velocity = new Vector2(-1, 0);
+        rb.velocity = new Vector2(dir, 0);
 	}
 	
 	protected void Move (int xDir, int yDir) 
