@@ -3,7 +3,7 @@ using System.Collections;
 
 public class AmanitaController : MonoBehaviour {
 	private Rigidbody2D rb;
-	private PolygonCollider2D boxCollider;
+	private BoxCollider2D boxCollider;
 	private Transform transform;
 	private Animator animator;
 
@@ -13,7 +13,7 @@ public class AmanitaController : MonoBehaviour {
 	private int counter = 0;
 	void Start () {
 		rb = GetComponent<Rigidbody2D> ();
-		boxCollider = GetComponent<PolygonCollider2D> ();
+		boxCollider = GetComponent<BoxCollider2D> ();
 		transform = GetComponent<Transform> ();
 		animator = GetComponent<Animator> ();
 		inverseMoveTime = 1f / moveTime;

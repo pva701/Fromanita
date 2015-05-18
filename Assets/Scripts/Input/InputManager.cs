@@ -30,8 +30,8 @@ public class InputManager : MonoBehaviour {
         isLeft = false;
         isRight = false;
         isDown = false;
-//#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
-#if UNITY_STANDALONE || UNITY_WEBPLAYER
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+//#if UNITY_STANDALONE || UNITY_WEBPLAYER
         dirHoriz = (int)Input.GetAxis("Horizontal");
         dirVert = (int)Input.GetAxis("Vertical");
         if (dirVert > 0) dirVert = 0;
@@ -47,9 +47,9 @@ public class InputManager : MonoBehaviour {
                     mobileStartTouch = touch.position;
                 }
             }
-
+			mobileOutGround = false;
             if (!mobileOutGround) {
-                if (touch.position.y <= 100)
+				//if (touch.position.y <= 100)
                     dirHoriz = (touch.position.x > Screen.width / 2 ? 1 : -1);
             } else if (touch.phase == TouchPhase.Ended)
             {
