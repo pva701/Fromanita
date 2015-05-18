@@ -88,12 +88,12 @@ public class GameManager : MonoBehaviour
     {
         if (topAmanitaCache > -INF / 2)
             return topAmanitaCache;
-        PolygonCollider2D collider = amanita.GetComponent<PolygonCollider2D>();
-        for (int j = 0; j < collider.points.Length; ++j)
+        BoxCollider2D collider = amanita.GetComponent<BoxCollider2D>();
+        /*for (int j = 0; j < collider.points.Length; ++j)
         {
             Vector2 pnt = collider.points[j];
             topAmanitaCache = Mathf.Max(topAmanitaCache, pnt.y + amanita.transform.position.y - collider.offset.y);
-        }
-        return topAmanitaCache;
+        }*/
+        return topAmanitaCache = amanita.transform.position.y - collider.offset.y + collider.size.y;
     }
 }

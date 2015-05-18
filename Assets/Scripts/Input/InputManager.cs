@@ -31,8 +31,8 @@ public class InputManager : MonoBehaviour {
         isLeft = false;
         isRight = false;
         isDown = false;
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
-//#if UNITY_STANDALONE || UNITY_WEBPLAYER
+//#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+#if UNITY_STANDALONE || UNITY_WEBPLAYER
         dirHoriz = (int)Input.GetAxis("Horizontal");
         dirVert = (int)Input.GetAxis("Vertical");
         if (dirVert > 0) dirVert = 0;
@@ -50,16 +50,15 @@ public class InputManager : MonoBehaviour {
                     mobileStartTouch = worldPos;
                 }
             }
-			mobileOutGround = false;
-            if (!mobileOutGround) {
-				//if (touch.position.y <= 100)
->>>>>>> 197ee7dcd9936c3f973c6946f42dbd7d4f40df60
-                    dirHoriz = (touch.position.x > Screen.width / 2 ? 1 : -1);
-            } else if (touch.phase == TouchPhase.Ended)
+            if (!mobileOutGround)
             {
+                if (worldPos.y <= GameManager.instance.GetTopAmanita())
+                    dirHoriz = (touch.position.x > Screen.width / 2 ? 1 : -1);
+            } else if (touch.phase == TouchPhase.Moved)
+            {
+                if (worldPos.y - mobileStartTouch.y < -0.5f) dirVert = -1;
+            } else if (touch.phase == TouchPhase.Ended) 
                 mobileOutGround = false;
-                if (worldPos.y - mobileStartTouch.y < -0.5) dirVert = -1;
-            }
         }
 #endif
         if (dirHoriz < 0) isLeft = true;
