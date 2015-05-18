@@ -59,14 +59,10 @@ public class GameManager : MonoBehaviour
     private IEnumerator StartMosquito()
     {
         for (; ; )
-        {
-            //MosquitoController controller = new MosquitoController();
-            //MosquitoController controller = prefabMosquito.GetComponent<MosquitoController>();
-            
+        {   
             MosquitoController controller = prefabMosquito.GetComponent<MosquitoController>();
             controller.liveTime = timeLiveMosquito;
             GameObject instance = Instantiate(prefabMosquito) as GameObject;
-            //controller.StartMoving(timeLiveMosquito);
             yield return new WaitForSeconds(generateNextMosquitoDelay);
         }
     }
