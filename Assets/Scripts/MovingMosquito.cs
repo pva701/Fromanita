@@ -48,6 +48,28 @@ public class MovingMosquito : MonoBehaviour {
         }   
     }
 
+    public void StartMoving(float liveTime)
+    {
+        this.liveTime = liveTime;
+        Rect rect = GameManager.instance.GetFieldRect();
+        //print("yMax = " + rect.yMax);
+        Random.seed = System.DateTime.Now.Millisecond;
+        boundRect = new Rect(rect.xMin, rect.yMin + 2, rect.xMax - rect.xMin, rect.yMax - rect.yMin - 2);
+        //print(boundRect.yMin + " " + boundRect.yMax);
+        leftDown = new Vector2(boundRect.xMin, boundRect.yMin);
+        leftTop = new Vector2(boundRect.xMin, boundRect.yMax);
+        rightDown = new Vector2(boundRect.xMax, boundRect.yMin);
+        rightTop = new Vector2(boundRect.xMax, boundRect.yMax);
+
+        //print("a = " + a + " b = " + b + " center = " + center);
+        //print("p1 = " + p1 + " p2 = " + p2 + " p3 = " + p3);
+        Vector2 p2 = new Vector2(boundRect.xMin, Random.Range(boundRect.yMin, boundRect.yMax));
+        Vector2 p1 = RandPointInRect();
+        transform.position = p2;
+        queueTrajectory.Enqueue(new LineTrajectory(p2, p1, SPEED));
+        ContinueTrajectory();
+    }
+
     private void ContinueTrajectory()
     {
         ITrajectory trajectory = queueTrajectory.Dequeue();
@@ -92,27 +114,7 @@ public class MovingMosquito : MonoBehaviour {
         queueTrajectory.Enqueue(new LineTrajectory(b, p3, SPEED));
     }
 
-    public void StartMoving(float liveTime)
-    {
-        this.liveTime = liveTime;
-        Rect rect = GameManager.instance.GetFieldRect();
-        //print("yMax = " + rect.yMax);
-        Random.seed = System.DateTime.Now.Millisecond;
-        boundRect = new Rect(rect.xMin, rect.yMin + 2, rect.xMax - rect.xMin, rect.yMax - rect.yMin - 2);
-        leftDown = new Vector2(boundRect.xMin, boundRect.yMin);
-        leftTop = new Vector2(boundRect.xMin, boundRect.yMax);
-        rightDown = new Vector2(boundRect.xMax, boundRect.yMin);
-        rightTop = new Vector2(boundRect.xMax, boundRect.yMax);
-
-        //print("a = " + a + " b = " + b + " center = " + center);
-        //print("p1 = " + p1 + " p2 = " + p2 + " p3 = " + p3);
-        Vector2 p2 = new Vector2(boundRect.xMin, Random.Range(boundRect.yMin, boundRect.yMax));
-        Vector2 p1 = RandPointInRect();
-        transform.position = p2;
-        queueTrajectory.Enqueue(new LineTrajectory(p2, p1, SPEED));
-        ContinueTrajectory();
-    }
-
+    
     private Vector2 getBisector(Vector2 a, Vector2 b)
     {
         return (a * b.magnitude + b * a.magnitude) / (2 * a.magnitude * b.magnitude);
