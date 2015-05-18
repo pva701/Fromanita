@@ -31,8 +31,8 @@ public class InputManager : MonoBehaviour {
         isLeft = false;
         isRight = false;
         isDown = false;
-//#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
-#if UNITY_STANDALONE || UNITY_WEBPLAYER
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+//#if UNITY_STANDALONE || UNITY_WEBPLAYER
         dirHoriz = (int)Input.GetAxis("Horizontal");
         dirVert = (int)Input.GetAxis("Vertical");
         if (dirVert > 0) dirVert = 0;

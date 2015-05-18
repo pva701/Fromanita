@@ -28,18 +28,35 @@ public class AmanitaController : MonoBehaviour {
 		}
 	}
 
+	void OnCollisionEnter2D(Collision2D collision)
+	{
+		print ("Collision " + collision.gameObject.name);
+		//return;
+		if (collision.gameObject.name == "Wall")
+		{
+			ChangeDirection();
+		} else if (collision.gameObject.name == "Stump")
+		{
+			ChangeDirection();
+		}
+	}
+
+	private void ChangeDirection() {
+		Vector3 tmp = transform.localScale;
+		tmp.x *= -1;
+		dir *= -1;
+		transform.localScale = tmp;
+	}
+	
 	protected void Move (int xDir, int yDir) 
 	{
 		Vector2 start = transform.position;
-		Vector2 end = start + new Vector2 (xDir, yDir);
+		Vector2 end = start + new Vector2 (xDir, yDir) / 2;
 		boxCollider.enabled = false;
 		RaycastHit2D hit = Physics2D.Linecast (start, end);
 		boxCollider.enabled = true;
 		if (hit.transform != null) {
-			Vector3 tmp = transform.localScale;
-			tmp.x *= -1;
-			dir *= -1;
-			transform.localScale = tmp;
+			//ChangeDirection();
 		}
 		Vector3 np = Vector3.MoveTowards(rb.position, end, inverseMoveTime * Time.deltaTime);
 		rb.MovePosition(np);
