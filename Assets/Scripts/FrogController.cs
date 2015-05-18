@@ -13,12 +13,6 @@ public class FrogController : MonoBehaviour {
         rb2D = GetComponent<Rigidbody2D>();
 	}
 
-
-    void MoveByX(float xForce)
-    {
-        
-    }
-
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.name == "Ground")
@@ -44,6 +38,7 @@ public class FrogController : MonoBehaviour {
         else if (InputManager.instance.isRight) rb2D.AddForce(new Vector2(STEP_FORCE, 0));
         else if (InputManager.instance.isDown)
         {
+            //rb2D.velocity = new Vector2(0, rb2D.velocity.y);
             //print("down");
             rb2D.AddForce(new Vector2(0, -STEP_FORCE*2));
         }

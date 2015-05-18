@@ -27,34 +27,37 @@ public class InputManager : MonoBehaviour {
 
 	void Update () {
         dirHoriz = 0;
+        dirVert = 0;
         isLeft = false;
         isRight = false;
         isDown = false;
-//#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
-#if UNITY_STANDALONE || UNITY_WEBPLAYER
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+//#if UNITY_STANDALONE || UNITY_WEBPLAYER
         dirHoriz = (int)Input.GetAxis("Horizontal");
         dirVert = (int)Input.GetAxis("Vertical");
         if (dirVert > 0) dirVert = 0;
         if (dirVert != 0 && dirHoriz != 0) dirVert = 0;
 #else
+        
         if (Input.touchCount > 0) {
             Touch touch = Input.touches[0];
+            Vector2 worldPos = Camera.main.ScreenToWorldPoint(touch.position);
             if (touch.phase == TouchPhase.Began)
             {
-                if (touch.position.y > 100)
+                if (worldPos.y > GameManager.instance.GetTopAmanita())
                 {
                     mobileOutGround = true;
-                    mobileStartTouch = touch.position;
+                    mobileStartTouch = worldPos;
                 }
             }
 
             if (!mobileOutGround) {
-                if (touch.position.y <= 100)
+                if (worldPos.y <= GameManager.instance.GetTopAmanita()) ;
                     dirHoriz = (touch.position.x > Screen.width / 2 ? 1 : -1);
             } else if (touch.phase == TouchPhase.Ended)
             {
                 mobileOutGround = false;
-                if (touch.position.y - mobileStartTouch.y < 0) isDown = true;
+                if (worldPos.y - mobileStartTouch.y < -0.5) dirVert = -1;
             }
         }
 #endif

@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     private Vector3 frogPosition;
     private Vector3 amanitaPosition;
     private GameObject frogStore;
+    private static float INF = 100000f;
 
     void Awake()
     {
@@ -61,9 +62,11 @@ public class GameManager : MonoBehaviour
         {
             //MosquitoController controller = new MosquitoController();
             //MosquitoController controller = prefabMosquito.GetComponent<MosquitoController>();
+            
+            MosquitoController controller = prefabMosquito.GetComponent<MosquitoController>();
+            controller.liveTime = timeLiveMosquito;
             GameObject instance = Instantiate(prefabMosquito) as GameObject;
-            MosquitoController controller = instance.GetComponent<MosquitoController>();
-            controller.StartMoving(timeLiveMosquito);
+            //controller.StartMoving(timeLiveMosquito);
             yield return new WaitForSeconds(generateNextMosquitoDelay);
         }
     }
@@ -82,5 +85,19 @@ public class GameManager : MonoBehaviour
                 yMax = Mathf.Max(yMax, pnt.y + walls.transform.position.y - colliders[i].offset.y);
             }
         return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
+    }
+
+    private float topAmanitaCache = -INF;
+    public float GetTopAmanita()
+    {
+        if (topAmanitaCache > -INF / 2)
+            return topAmanitaCache;
+        PolygonCollider2D collider = amanita.GetComponent<PolygonCollider2D>();
+        for (int j = 0; j < collider.points.Length; ++j)
+        {
+            Vector2 pnt = collider.points[j];
+            topAmanitaCache = Mathf.Max(topAmanitaCache, pnt.y + amanita.transform.position.y - collider.offset.y);
+        }
+        return topAmanitaCache;
     }
 }
