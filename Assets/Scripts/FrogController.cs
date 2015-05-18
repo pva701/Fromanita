@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿//#define INERTIA
+using UnityEngine;
 using System.Collections;
 
 public class FrogController : MonoBehaviour {
@@ -6,7 +7,7 @@ public class FrogController : MonoBehaviour {
 
     private Animator animator;
     private Rigidbody2D rb2D;
-    private float STEP_FORCE = 10.0f;
+    private float STEP_FORCE = 10f;
 
 	void Awake() {
         animator = GetComponent<Animator>();
@@ -33,35 +34,35 @@ public class FrogController : MonoBehaviour {
             DestroyObject(collider.gameObject);
     }
 
+#if INERTIA
+    void Update () {
+        if (InputManager.instance.isLeft) rb2D.AddForce(new Vector2(-STEP_FORCE, 0));
+        else if (InputManager.instance.isRight) rb2D.AddForce(new Vector2(STEP_FORCE, 0));
+        else if (InputManager.instance.isDown) rb2D.AddForce(new Vector2(0, -STEP_FORCE * 2));
+    }
+#else
+
 	void FixedUpdate() {
 		Vector2 v = rb2D.velocity;
 		v.x = 0;
 		rb2D.velocity = v;
 	}
 
-	void Update () {
-/*<<<<<<< HEAD
-        if (InputManager.instance.isLeft) rb2D.AddForce(new Vector2(-STEP_FORCE, 0));
-        else if (InputManager.instance.isRight) rb2D.AddForce(new Vector2(STEP_FORCE, 0));
-        else if (InputManager.instance.isDown)
-        {
-            //rb2D.velocity = new Vector2(0, rb2D.velocity.y);
-=======*/
+    void Update () {
         if (InputManager.instance.isLeft) {
 			Vector2 pos = rb2D.position;
 			pos += new Vector2(-0.1f, 0f);
 			rb2D.position = pos;
-			//rb2D.AddForce (new Vector2 (-STEP_FORCE, 0));
 		} else if (InputManager.instance.isRight) {
 			Vector2 pos = rb2D.position;
 			pos += new Vector2(0.1f, 0f);
 			rb2D.position = pos;
-			//rb2D.AddForce (new Vector2 (STEP_FORCE, 0));
 		} else if (InputManager.instance.isDown) {
-            //print("down");
+            print("down");
             rb2D.AddForce(new Vector2(0, -STEP_FORCE*2));
         }
 	}
+#endif
 
     public void Die()
     {
