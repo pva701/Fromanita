@@ -9,6 +9,8 @@ public class FrogController : MonoBehaviour {
     private Rigidbody2D rb2D;
     private float STEP_FORCE = 10f;
 
+	public float hSpeed = 0.1f;
+
 	void Awake() {
         animator = GetComponent<Animator>();
         rb2D = GetComponent<Rigidbody2D>();
@@ -19,6 +21,7 @@ public class FrogController : MonoBehaviour {
         if (collision.gameObject.name == "Ground")
         {
             //print("ground");
+			rb2D.velocity = Vector2.zero;
             GameManager.instance.GameOver();
         } else if (collision.gameObject.name == "Amanita")
         {
@@ -51,11 +54,11 @@ public class FrogController : MonoBehaviour {
     void Update () {
         if (InputManager.instance.isLeft) {
 			Vector2 pos = rb2D.position;
-			pos += new Vector2(-0.1f, 0f);
+			pos += new Vector2(-1, 0f) * hSpeed;
 			rb2D.position = pos;
 		} else if (InputManager.instance.isRight) {
 			Vector2 pos = rb2D.position;
-			pos += new Vector2(0.1f, 0f);
+			pos += new Vector2(1, 0f) * hSpeed;
 			rb2D.position = pos;
 		} else if (InputManager.instance.isDown) {
             print("down");

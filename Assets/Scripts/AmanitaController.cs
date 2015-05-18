@@ -7,6 +7,8 @@ public class AmanitaController : MonoBehaviour {
 	private Transform transform;
 	private Animator animator;
 
+	public float hSpeed = 0.05f;
+
 	public float moveTime = .5f;
 	private float inverseMoveTime;
 	private int dir = 1;
@@ -50,17 +52,9 @@ public class AmanitaController : MonoBehaviour {
 	
 	protected void Move (int xDir, int yDir) 
 	{
-		Vector2 start = transform.position;
-		Vector2 end = start + new Vector2 (xDir, yDir) / 2;
-		boxCollider.enabled = false;
-		RaycastHit2D hit = Physics2D.Linecast (start, end);
-		boxCollider.enabled = true;
-		if (hit.transform != null) {
-			//ChangeDirection();
-		}
-		Vector3 np = Vector3.MoveTowards(rb.position, end, inverseMoveTime * Time.deltaTime);
-		rb.MovePosition(np);
-		//print (np);
+		Vector2 pos = rb.position;
+		pos += new Vector2 (dir, 0) * hSpeed;
+		rb.position = pos;
 	}
 
     public void StopMoving()
