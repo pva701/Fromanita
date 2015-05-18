@@ -58,7 +58,6 @@ public class FrogController : MonoBehaviour {
 			pos += new Vector2(0.1f, 0f);
 			rb2D.position = pos;
 		} else if (InputManager.instance.isDown) {
-            print("down");
             rb2D.AddForce(new Vector2(0, -STEP_FORCE*2));
         }
 	}

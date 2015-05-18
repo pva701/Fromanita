@@ -10,6 +10,7 @@ public class AmanitaController : MonoBehaviour {
 	public float moveTime = .5f;
 	private float inverseMoveTime;
 	private int dir = 1;
+    private int SPEED = 1;
 	private int counter = 0;
 
 	void Start () {
@@ -18,7 +19,7 @@ public class AmanitaController : MonoBehaviour {
 		transform = GetComponent<Transform> ();
 		animator = GetComponent<Animator> ();
 		inverseMoveTime = 1f / moveTime;
-        rb.velocity = new Vector2(1, 0);
+        rb.velocity = new Vector2(SPEED, 0);
 	}
 
 	void Update () {
@@ -44,8 +45,8 @@ public class AmanitaController : MonoBehaviour {
         }
         else if (collision.gameObject.name == "Frog")
         {
-            if (rb.velocity.x > 0) rb.velocity = new Vector2(1, 0);
-            else rb.velocity = new Vector2(-1, 0);
+            if (dir > 0) rb.velocity = new Vector2(SPEED, 0);
+            else rb.velocity = new Vector2(-SPEED, 0);
         }
 	}
 
@@ -54,7 +55,7 @@ public class AmanitaController : MonoBehaviour {
 		tmp.x *= -1;
 		dir *= -1;
 		transform.localScale = tmp;
-        rb.velocity = new Vector2(dir, 0);
+        rb.velocity = new Vector2(dir * SPEED, 0);
 	}
 	
 	protected void Move (int xDir, int yDir) 
@@ -74,6 +75,7 @@ public class AmanitaController : MonoBehaviour {
 
     public void StopMoving()
     {
+        //rb.velocity = new Vector2(0, 0);
         enabled = false;
         //TODO write this
     }
