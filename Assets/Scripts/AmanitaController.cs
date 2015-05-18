@@ -17,10 +17,11 @@ public class AmanitaController : MonoBehaviour {
 		transform = GetComponent<Transform> ();
 		animator = GetComponent<Animator> ();
 		inverseMoveTime = 1f / moveTime;
+        rb.velocity = new Vector2(1, 0);
 	}
 
 	void Update () {
-		Move (dir, 0);
+		//Move (dir, 0);
 		if (counter++ == 100) {
 			counter = 0;
 			if (Random.Range (0, 2) == 0)
@@ -30,15 +31,16 @@ public class AmanitaController : MonoBehaviour {
 
 	void OnCollisionEnter2D(Collision2D collision)
 	{
-		print ("Collision " + collision.gameObject.name);
+		//print ("Collision " + collision.gameObject.name);
 		//return;
 		if (collision.gameObject.name == "Wall")
 		{
+            print("WALL");
 			ChangeDirection();
 		} else if (collision.gameObject.name == "Stump")
 		{
 			ChangeDirection();
-		}
+		} 
 	}
 
 	private void ChangeDirection() {
@@ -46,6 +48,7 @@ public class AmanitaController : MonoBehaviour {
 		tmp.x *= -1;
 		dir *= -1;
 		transform.localScale = tmp;
+        rb.velocity = new Vector2(-1, 0);
 	}
 	
 	protected void Move (int xDir, int yDir) 
@@ -56,7 +59,7 @@ public class AmanitaController : MonoBehaviour {
 		RaycastHit2D hit = Physics2D.Linecast (start, end);
 		boxCollider.enabled = true;
 		if (hit.transform != null) {
-			//ChangeDirection();
+			ChangeDirection();
 		}
 		Vector3 np = Vector3.MoveTowards(rb.position, end, inverseMoveTime * Time.deltaTime);
 		rb.MovePosition(np);
