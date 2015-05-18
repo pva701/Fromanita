@@ -33,12 +33,31 @@ public class FrogController : MonoBehaviour {
             DestroyObject(collider.gameObject);
     }
 
+	void FixedUpdate() {
+		Vector2 v = rb2D.velocity;
+		v.x = 0;
+		rb2D.velocity = v;
+	}
+
 	void Update () {
+/*<<<<<<< HEAD
         if (InputManager.instance.isLeft) rb2D.AddForce(new Vector2(-STEP_FORCE, 0));
         else if (InputManager.instance.isRight) rb2D.AddForce(new Vector2(STEP_FORCE, 0));
         else if (InputManager.instance.isDown)
         {
             //rb2D.velocity = new Vector2(0, rb2D.velocity.y);
+=======*/
+        if (InputManager.instance.isLeft) {
+			Vector2 pos = rb2D.position;
+			pos += new Vector2(-0.1f, 0f);
+			rb2D.position = pos;
+			//rb2D.AddForce (new Vector2 (-STEP_FORCE, 0));
+		} else if (InputManager.instance.isRight) {
+			Vector2 pos = rb2D.position;
+			pos += new Vector2(0.1f, 0f);
+			rb2D.position = pos;
+			//rb2D.AddForce (new Vector2 (STEP_FORCE, 0));
+		} else if (InputManager.instance.isDown) {
             //print("down");
             rb2D.AddForce(new Vector2(0, -STEP_FORCE*2));
         }

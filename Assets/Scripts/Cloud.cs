@@ -12,6 +12,15 @@ public class Cloud : MonoBehaviour {
 		Rigidbody2D rb = GetComponent<Rigidbody2D> ();
 		rb.gravityScale = 0f;
 		rb.AddForce (new Vector2 (force, 0f));
+		BackgroundManager.instance.cloudCount += 1;
+	}
+
+	void Update() {
+
+	}
+
+	void OnDestroy() {
+		BackgroundManager.instance.cloudCount -= 1;
 	}
 
 	void OnBecameInvisible() {

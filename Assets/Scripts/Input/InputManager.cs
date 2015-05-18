@@ -50,9 +50,10 @@ public class InputManager : MonoBehaviour {
                     mobileStartTouch = worldPos;
                 }
             }
-
+			mobileOutGround = false;
             if (!mobileOutGround) {
-                if (worldPos.y <= GameManager.instance.GetTopAmanita()) ;
+				//if (touch.position.y <= 100)
+>>>>>>> 197ee7dcd9936c3f973c6946f42dbd7d4f40df60
                     dirHoriz = (touch.position.x > Screen.width / 2 ? 1 : -1);
             } else if (touch.phase == TouchPhase.Ended)
             {
